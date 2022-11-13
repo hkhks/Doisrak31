@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dosirak31.client.signup.dao.ClientDao">
+
+	<!-- 회원가입 회원정보 입력 -->
+
+	<insert id="clientSignup" parameterType="client">
+		/* Client - clientSignup */
+		<selectKey keyProperty="client_no" resultType="int" order="BEFORE">
+			select client_seq.nextval from dual
+		</selectKey>
+		
+		INSERT INTO client(client_no, client_id, client_pw, client_name, client_email, client_phone, client_address, client_rrn)
+		VALUES(#{client_no}, #{client_id}, #{client_pw}, #{client_name}, #{client_email}, #{client_phone}, #{client_address}, #{client_rrn})	
+	</insert>
+	
+	
+	<!-- 아이디 중복검사 -->
+  	<select id="idCheck" resultType="int">
+  	
+  		select count(*) from client where client_id = #{client_id}
+  	
+  	</select>
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

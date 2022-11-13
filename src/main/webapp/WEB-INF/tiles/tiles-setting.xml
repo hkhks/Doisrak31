@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+  "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+ <tiles-definitions> 
+ 	<definition name="content" template="/WEB-INF/views/template/client/contentLayout.jsp">
+ 		<put-attribute name="header" value="/WEB-INF/views/template/client/header.jsp"/>
+ 		<put-attribute name="body" value=""/>
+ 		<put-attribute name="footer" value="/WEB-INF/views/template/client/footer.jsp"/>
+ 	</definition>
+ 	<definition name="food/client/*" extends="content">
+ 		<put-attribute name="body" value="/WEB-INF/views/food/client/{1}.jsp"/>
+ 	</definition>
+ 	<definition name="mypage/client/*" extends="content">
+ 		<put-attribute name="body" value="/WEB-INF/views/mypage/client/{1}.jsp"/>
+ 	</definition>
+ 	<definition name="health/client/*" extends="content">
+ 		<put-attribute name="body" value="/WEB-INF/views/health/client/{1}.jsp"/>
+ 	</definition>
+ 	<definition name="community/client/*" extends="content">
+ 		<put-attribute name="body" value="/WEB-INF/views/community/client/{1}.jsp"/>
+ 	</definition>
+ 	<definition name="login" extends="content">
+ 		<put-attribute name="body" value="/WEB-INF/views/login.jsp"/>
+ 	</definition>
+ 	
+ 	<!-- 로그인 전 -->
+ 	<definition name="food/noclient/*" extends="content">
+ 		<put-attribute name="header" value="/WEB-INF/views/template/client/headerNoLogin.jsp"/>
+ 		<put-attribute name="body" value="/WEB-INF/views/food/noclient/{1}.jsp"/>
+ 		<put-attribute name="footer" value="/WEB-INF/views/template/client/footerNoLogin.jsp"/>
+ 	</definition>
+ 	<definition name="login/client/*" extends="content">
+ 		<put-attribute name="header" value="/WEB-INF/views/template/client/headerNoLogin.jsp"/>
+ 		<put-attribute name="body" value="/WEB-INF/views/login/client/{1}.jsp"/>
+ 		<put-attribute name="footer" value="/WEB-INF/views/template/client/footerNoLogin.jsp"/>
+ 	</definition>
+ 	<definition name="main" extends="content">
+ 		<put-attribute name="header" value="/WEB-INF/views/template/client/headerNoLogin.jsp"/>
+ 		<put-attribute name="body" value="/WEB-INF/views/main.jsp"/>
+ 		<put-attribute name="footer" value="/WEB-INF/views/template/client/footerNoLogin.jsp"/>
+ 	</definition>
+ 	<definition name="foodReview/client/*" extends="content">
+ 		<put-attribute name="body" value="/WEB-INF/views/foodReview/client/{1}.jsp"/>
+ 	</definition>
+ 	<definition name="foodReview/noclient/*" extends="content">
+ 		<put-attribute name="header" value="/WEB-INF/views/template/client/headerNoLogin.jsp"/>
+ 		<put-attribute name="body" value="/WEB-INF/views/foodReview/noclient/{1}.jsp"/>
+ 		<put-attribute name="footer" value="/WEB-INF/views/template/client/footerNoLogin.jsp"/>
+ 	</definition>
+ 	<!-- 로그인 전 끝-->
+ 	<definition name="login/success/*" extends="content">
+ 		<put-attribute name="body" value="/WEB-INF/views/login/success/{1}.jsp"/>
+ 	</definition>
+ 	<!-- 회원가입 -->
+ 	<definition name="signup/client/*" extends="content">
+ 		<put-attribute name="header" value="/WEB-INF/views/template/client/headerNoLogin.jsp"/>
+ 		<put-attribute name="body" value="/WEB-INF/views/signup/client/{1}.jsp"/>
+ 		<put-attribute name="footer" value="/WEB-INF/views/template/client/footerNoLogin.jsp"/>
+ 	</definition>
+ </tiles-definitions> 

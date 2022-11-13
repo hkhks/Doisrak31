@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dosirak31.admin.adminPage.dao.AdminPageDao">
+	<!-- 회원 list조회 -->
+	<select id="memberList" parameterType="orderDetail" resultType="orderDetail">
+		select client_no
+		,client_id
+		,substr(client_name,1,1)||lpad('*',length(client_name)-2,'*')||substr(client_name,length(client_name),1) client_name
+		,REGEXP_REPLACE(client_phone,'(\d{3})\-(\d{3,4})\-(\d{4})','\1-****-\3') client_phone
+		,concat('****',substr(client_email,4,length(client_email))) client_email
+		,to_char(client_date,'yyyy-mm-dd') client_date
+		,to_char(client_update,'yyyy-mm-dd') client_update
+		from ( 
+			select rownum as rnum, client_no,client_id,client_name,client_email,client_phone,
+            client_address,client_date,client_update 
+            from client
+            where
+	        <![CDATA[ rownum <= #{pageNum} * #{amount}
+	        order by client_no desc
+        ) clientList
+        where rnum > (#{pageNum}-1) * #{amount}
+	   	]]>
+	</select>
+		
+
+	 <!-- 페이징처리를 위한 list개수  -->
+	<select id="memberListCnt" resultType="int">
+		select count(*) from client
+	</select>
+	
+	 <!-- 회원 나이별 통계  -->
+	<select id="ageGraph" resultType="memberGraph">
+		<![CDATA[
+		 select count(case when age<19 then 1 end) "lowerTwenty"
+        ,count(case when age between 20 and 29 then 1 end) "twenty"
+        ,count(case when age between 30 and 39 then 1 end) "thirdy"
+        ,count(case when age between 40 and 49 then 1 end) "fourty"
+        ,count(case when age between 50 and 59 then 1 end) "fifty"
+        ,count(case when age between 60 and 69 then 1 end) "sixty"
+        ,count(case when age >=70 then 1 end) "seventy"
+        from (
+            select to_char(sysdate,'yyyy')-concat(case when substr(client_rrn,8,1) in
+            ('1','2') then '19' else '20' end,substr(client_rrn,1,2)) as age
+            from client
+        )
+        ]]>
+	</select>
+	
+	<!-- 회원 성별 통계  -->
+	<select id="genderGraph" resultType="memberGraph">
+		select count(case when substr(client_rrn,8,1) in ('1','3') then 1 end) "man"
+		,count(case when substr(client_rrn,8,1) in ('2','4') then 1 end) "woman"
+		from client
+	</select>
+	
+	<!-- 오늘 가입한 회원 수  -->
+	<select id="countMember" resultType="memberGraph">
+		select NVL(count(*),0) today 
+		from client 
+		where to_char(client_date,'yyyymmdd') = to_char(sysdate,'yyyymmdd')
+	</select>
+	
+	<!-- 회원 목록 엑셀 파일로 다운로드 시 사용할 쿼리문 -->
+	<select id="memberListExcel" parameterType="orderDetail" resultType="orderDetail">
+		select client_no,client_id,client_name,client_email,client_phone,client_address,to_char(client_date,'YYYY-MM-DD') client_date,client_update 
+		from client 
+	    order by client_no asc
+	</select>
+</mapper>

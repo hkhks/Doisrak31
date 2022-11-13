@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dosirak31.food.order.dao.FoodOrderDao">
+	
+
+	<!-- 장바구니에 insert -->
+	<insert id="bagInsert" parameterType="orderDetail">
+		<selectKey keyProperty="order_no" resultType="int" order="BEFORE">
+			SELECT ORDER_NO FROM ORDERS WHERE CLIENT_NO=#{client_no} AND ORDER_STATUS_NO=1 UNION ALL SELECT 0 AS ORDER_NO FROM DUAL
+			 WHERE NOT EXISTS(SELECT ORDER_NO FROM ORDERS WHERE CLIENT_NO=#{client_no} AND ORDER_STATUS_NO=1 )
+		</selectKey>
+		<choose>
+		<when test="order_no!=0">
+			INSERT ALL
+		    into dosirak(dosirak_no, dosirak_name, food_img1,food_img2,food_img3,food_img4,food_img5)
+		    values((select NVL(MAX(DOSIRAK_NO),0)+1 FROM DOSIRAK),#{dosirak_name},#{food_img1},#{food_img2}, #{food_img3}, #{food_img4}, #{food_img5})
+		    into order_detail(order_no, order_quantity,order_price,dosirak_no)
+		    values(#{order_no},#{order_quantity},#{order_price},(select NVL(MAX(DOSIRAK_NO),0)+1 FROM DOSIRAK))
+		    SELECT * FROM DUAL
+	    </when>
+	    <otherwise>
+	    	INSERT ALL
+		    into dosirak(dosirak_no, dosirak_name, food_img1,food_img2,food_img3,food_img4,food_img5)
+		    values((select NVL(MAX(DOSIRAK_NO),0)+1 FROM DOSIRAK),#{dosirak_name},#{food_img1},#{food_img2}, #{food_img3}, #{food_img4}, #{food_img5})
+		    into orders(order_no,client_no,order_status_no)
+    		values((SELECT NVL(MAX(ORDER_NO),0)+1 FROM ORDERS),#{client_no},1)
+		    into order_detail(order_no, order_quantity,order_price,dosirak_no)
+		    values((SELECT NVL(MAX(ORDER_NO),0)+1 FROM ORDERS),#{order_quantity},#{order_price},(select NVL(MAX(DOSIRAK_NO),0)+1 FROM DOSIRAK))
+		    SELECT * FROM DUAL
+	    </otherwise>
+	    </choose>
+	</insert>
+	
+	<select id="bagList" parameterType="int" resultType="orderDetail">
+	    SELECT D.DOSIRAK_NO DOSIRAK_NO,DOSIRAK_NAME,FOOD_img1,FOOD_img2,FOOD_img3,FOOD_img4,FOOD_img5,
+		OD.ORDER_NO ORDER_NO,ORDER_QUANTITY,ORDER_PRICE, ORDER_DATE,ORDER_ADDRESS,CLIENT_NO,ORDER_STATUS_NO
+		FROM DOSIRAK D JOIN ORDER_DETAIL OD 
+		ON D.DOSIRAK_NO=OD.DOSIRAK_NO
+		JOIN ORDERS O
+		ON OD.ORDER_NO=O.ORDER_NO
+		WHERE CLIENT_NO=#{client_no} AND ORDER_STATUS_NO=1
+   </select>
+	
+	<!-- (장바구니에서 삭제 클릭 시)도시락 및 주문 상세 삭제 -->
+	<delete id="bagDelete1" parameterType="orderDetail">
+		delete from dosirak where dosirak_no=#{dosirak_no}
+	</delete>
+	
+	<!-- (장바구니에서 삭제 클릭 시)주문상세 몇개인지 조회 -->
+	<select id="bagOrderNo" parameterType="orderDetail" resultType="Integer">
+		select count(od.order_no) from order_detail od join orders o on od.order_no=o.order_no where od.order_no=#{order_no} and o.order_status_no=1
+	</select>
+	
+	<!-- (장바구니에서 삭제 클릭 시)주문테이블 삭제 -->
+	<delete id="bagDelete2" parameterType="orderDetail">
+			delete orders where order_no=#{order_no}
+	</delete>
+	
+	<update id="bagUpdate" parameterType="orderDetail">
+		update order_detail set order_quantity=#{order_quantity},order_price=#{order_price} where dosirak_no=#{dosirak_no}
+	</update>
+	
+	
+	<!-- 주문에 insert -->
+	<insert id="orderInsert" parameterType="orderDetail">
+	    	INSERT ALL
+		    into dosirak(dosirak_no, dosirak_name, food_img1,food_img2,food_img3,food_img4,food_img5)
+		    values((select NVL(MAX(DOSIRAK_NO),0)+1 FROM DOSIRAK),#{dosirak_name},#{food_img1},#{food_img2}, #{food_img3}, #{food_img4}, #{food_img5})
+		    into orders(order_no,client_no,order_status_no)
+    		values((SELECT NVL(MAX(ORDER_NO),0)+1 FROM ORDERS),#{client_no},2)
+		    into order_detail(order_no, order_quantity,order_price,dosirak_no)
+		    values((SELECT NVL(MAX(ORDER_NO),0)+1 FROM ORDERS),#{order_quantity},#{order_price},(select NVL(MAX(DOSIRAK_NO),0)+1 FROM DOSIRAK))
+		    SELECT * FROM DUAL
+	</insert>
+	
+	<select id="orderList" parameterType="orderDetail" resultType="orderDetail">
+		 SELECT D.DOSIRAK_NO DOSIRAK_NO,DOSIRAK_NAME,FOOD_img1,FOOD_img2,FOOD_img3,FOOD_img4,FOOD_img5,
+		OD.ORDER_NO ORDER_NO,ORDER_QUANTITY,ORDER_PRICE, ORDER_DATE,ORDER_ADDRESS,CLIENT_NO,ORDER_STATUS_NO
+		FROM DOSIRAK D JOIN ORDER_DETAIL OD 
+		ON D.DOSIRAK_NO=OD.DOSIRAK_NO
+		JOIN ORDERS O
+		ON OD.ORDER_NO=O.ORDER_NO where order_status_no=2 and client_no=#{client_no}
+   </select>
+   <!-- 결제 후 결제 테이블 insert -->
+   <insert id="paymentInsert" parameterType="orderDetail">
+   		insert into payment(payment_no,order_no,payment_method,client_no)
+   		values((select NVL(MAX(PAYMENT_NO),0)+1 FROM PAYMENT),#{order_no},'카카오페이',#{client_no})
+   </insert>
+   
+   <update id="orderUpdate" parameterType="orderDetail">
+   		update orders set order_date=sysdate,order_client_name=#{order_client_name}, order_client_phone=#{order_client_phone},
+   		order_address=#{order_address},order_status_no=3 where order_no=#{order_no}
+   </update>
+   
+   
+
+<!-- 게시판 리스트 조회(페이징 처리와 검색 처리) 및 댓글 갯수 구하기 -->
+	<select id="orderhistory" parameterType="orderDetail" resultType="orderDetail">
+
+	<![CDATA[    
+		select rnum,order_no, to_char(order_date,'YYYY-MM-DD HH24:MM:SS') as order_date, order_client_name, order_client_phone,order_address,
+         order_quantity, order_price, dosirak_name, payment_method,payment_delete,client_name,client_phone,order_status_no,food_img1,food_img2,food_img3,food_img4,food_img5
+         from ( select  rownum as rnum,order_no, order_date, order_client_name, order_client_phone,order_address,
+         order_quantity, order_price, dosirak_name, payment_method,payment_delete,client_name,client_phone,order_status_no,food_img1,food_img2,food_img3,food_img4,food_img5
+         from ( select   
+            o.order_no as order_no, order_date, order_client_name, order_client_phone,order_address,
+            order_quantity, order_price, dosirak_name, payment_method,payment_delete,client_name,client_phone,order_status_no,food_img1,food_img2,food_img3,food_img4,food_img5
+            from orders o join order_detail od  on o.order_no=od.order_no 
+            join dosirak d on d.dosirak_no=od.dosirak_no 
+            join payment p on p.order_no=o.order_no 
+            join client c on c.client_no=o.client_no
+              
+		        where    order_status_no=#{order_status_no} 
+		       
+              order by o.order_no desc
+        
+        ) orderList where 
+         rownum<=#{pageNum} *#{amount}
+         )orderList2
+        where rnum>(#{pageNum}-1)*#{amount}   
+  		]]>
+
+
+	</select>
+	
+	
+	
+	 <!-- 페이징처리를 위한 list개수  -->
+	<select id="orderListCnt" parameterType="orderDetail" resultType="int">
+		select count(*) from orders
+		<if test="order_status_no != ''"> <!-- 비어있지 않다면 -->
+		      where order_status_no=#{order_status_no} 
+		</if>
+	
+	</select>
+   
+   <!-- 게시판 리스트 조회(페이징 처리와 검색 처리) 및 댓글 갯수 구하기 -->
+	<select id="orderDetailHistory" parameterType="int" resultType="orderDetail">		
+			select 
+            o.order_no as order_no, to_char(order_date,'YYYY-MM-DD HH24:MM:SS'), order_client_name, order_client_phone,order_address,
+            order_quantity, order_price, dosirak_name, payment_method,payment_delete,client_name,client_phone,order_status_no,food_img1,food_img2,food_img3,food_img4,food_img5
+            from orders o join order_detail od  on o.order_no=od.order_no 
+            join dosirak d on d.dosirak_no=od.dosirak_no 
+            join payment p on p.order_no=o.order_no 
+            join client c on c.client_no=o.client_no where o.order_no=#{order_no}
+	</select>
+	
+   <update id="orderDelivery" parameterType="orderDetail">
+   		update orders set order_status_no=5,order_delivery_date=sysdate where order_no=#{order_no}
+   </update>
+   <update id="paymentDelete" parameterType="orderDetail">
+   		update payment set payment_delete=1 where order_no=#{order_no}
+   </update>
+   
+   
+   <select id="orderBeforeWeek" resultType="orderGraph">
+		select
+(select NVL(sum(order_price),0) from orders o join order_detail od on o.order_no=od.order_no where to_char(order_date,'yyyymmdd')=to_char(trunc(sysdate,'iw')-7,'yyyymmdd')) "monday",
+(select NVL(sum(order_price),0) from orders o join order_detail od on o.order_no=od.order_no where to_char(order_date,'yyyymmdd')=to_char(trunc(sysdate,'iw')-6,'yyyymmdd')) "tuesday",
+(select NVL(sum(order_price),0) from orders o join order_detail od on o.order_no=od.order_no where to_char(order_date,'yyyymmdd')=to_char(trunc(sysdate,'iw')-5,'yyyymmdd')) "wednesday",
+(select NVL(sum(order_price),0) from orders o join order_detail od on o.order_no=od.order_no where to_char(order_date,'yyyymmdd')=to_char(trunc(sysdate,'iw')-4,'yyyymmdd')) "thursday",
+(select NVL(sum(order_price),0) from orders o join order_detail od on o.order_no=od.order_no where to_char(order_date,'yyyymmdd')=to_char(trunc(sysdate,'iw')-3,'yyyymmdd')) "friday",
+(select NVL(sum(order_price),0) from orders o join order_detail od on o.order_no=od.order_no where to_char(order_date,'yyyymmdd')=to_char(trunc(sysdate,'iw')-2,'yyyymmdd')) "saturday",
+(select NVL(sum(order_price),0) from orders o join order_detail od on o.order_no=od.order_no where to_char(order_date,'yyyymmdd')=to_char(trunc(sysdate,'iw')-1,'yyyymmdd')) "sunday" from dual
+	</select>
+	
+	<select id="orderCurrentWeek" resultType="orderGraph">
+		select
+(select NVL(sum(order_price),0) from orders o join order_detail od on o.order_no=od.order_no where to_char(order_date,'yyyymmdd')=to_char(trunc(sysdate,'iw'),'yyyymmdd')) "monday",
+(select NVL(sum(order_price),0) from orders o join order_detail od on o.order_no=od.order_no where to_char(order_date,'yyyymmdd')=to_char(trunc(sysdate,'iw')+1,'yyyymmdd')) "tuesday",
+(select NVL(sum(order_price),0) from orders o join order_detail od on o.order_no=od.order_no where to_char(order_date,'yyyymmdd')=to_char(trunc(sysdate,'iw')+2,'yyyymmdd')) "wednesday",
+(select NVL(sum(order_price),0) from orders o join order_detail od on o.order_no=od.order_no where to_char(order_date,'yyyymmdd')=to_char(trunc(sysdate,'iw')+3,'yyyymmdd')) "thursday",
+(select NVL(sum(order_price),0) from orders o join order_detail od on o.order_no=od.order_no where to_char(order_date,'yyyymmdd')=to_char(trunc(sysdate,'iw')+4,'yyyymmdd')) "friday",
+(select NVL(sum(order_price),0) from orders o join order_detail od on o.order_no=od.order_no where to_char(order_date,'yyyymmdd')=to_char(trunc(sysdate,'iw')+5,'yyyymmdd')) "saturday",
+(select NVL(sum(order_price),0) from orders o join order_detail od on o.order_no=od.order_no where to_char(order_date,'yyyymmdd')=to_char(trunc(sysdate,'iw')+6,'yyyymmdd')) "sunday" from dual
+	</select>
+	
+	<select id="orderMonth" resultType="orderGraph">
+		select
+(select NVL(sum(order_price),0) from orders o join order_detail od on o.order_no=od.order_no where to_char(order_date,'yyyymmdd')=to_char(sysdate,'yyyymmdd')) "today",
+(select NVL(sum(order_price),0) from orders o join order_detail od on o.order_no=od.order_no where to_char(order_date,'YYYY-MM')=to_char(ADD_MONTHS(sysdate,-1),'YYYY-MM')) "beforeMonth",
+(select NVL(sum(order_price),0) from orders o join order_detail od on o.order_no=od.order_no where to_char(order_date,'YYYY-MM')=to_char(sysdate,'YYYY-MM')) "currentMonth" from dual
+	</select>
+   
+</mapper>

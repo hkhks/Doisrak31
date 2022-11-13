@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dosirak31.login.client.dao.ClientLoginDao">
+
+	
+	<select id="loginProcess" parameterType="clientLogin" resultType="clientLogin">
+		select client_no,client_id,client_name,client_email,client_phone,client_address,client_date,client_update,client_rrn
+		from client
+		where client_id = #{client_id} and client_pw = #{client_pw}
+	</select>
+	
+	
+	<select id="idConfirm" parameterType="clientLogin" resultType="clientLogin">
+		select *
+		from client
+		where client_name = #{client_name} and client_phone = #{client_phone}
+	</select>
+	
+	
+	<select id="getUserByEmail" parameterType="clientLogin" resultType="clientLogin">
+		select *
+		from client
+		where client_email = #{client_email}
+	
+	</select>
+	
+	
+	<!-- 회원정보조회 -->
+	<select id="selectMember" parameterType="clientLogin" resultType="clientLogin">
+		select * 
+		from client 
+		where client_name = #{client_name} and client_email = #{client_email} and client_id = #{client_id}
+	</select>
+	
+	
+	<!-- 비밀번호 재설정 -->
+	<update id="pwupdate" parameterType="clientLogin">
+		update client
+		set client_pw = #{client_pw}
+		where client_email = #{client_email}
+	</update>
+	
+</mapper>

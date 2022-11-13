@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dosirak31.mypage.client.dao.MypageClientDao">
+   
+   <!-- 회원 정보 -->
+   <select id="mypageClientList" parameterType="mypageClient" resultType="mypageClient">
+      SELECT client_no, client_id, client_name, client_pw, client_address, client_date, client_phone
+      FROM client
+      WHERE client_no = #{client_no}
+   </select>
+   
+   <!-- 상세페이지 -->
+   <select id="mypageClientDetail" parameterType="mypageClient" resultType="mypageClient">
+      SELECT *
+      FROM client
+      WHERE client_no = ${client_no}
+   </select>
+   
+   <!-- 회원 정보 삭제 -->
+   <delete id="mypageClientDelete" parameterType="mypageClient">
+      DELETE from client where client_no = #{client_no}
+   </delete>
+   
+   <!-- 회원정보 수정 -->
+   <update id="mypageClientUpdate" parameterType="mypageClient">
+      UPDATE client
+      SET client_pw = #{client_pw},
+         client_name = #{client_name},
+         client_rrn = #{client_rrn},
+         client_email = #{client_email},
+         client_phone = #{client_phone},
+         client_address = #{client_address},
+         client_update = sysdate
+      WHERE client_id = #{client_id}
+   </update>
+   
+   <!-- 비밀번호 확인 -->
+   <select id="mypageCheck" parameterType="mypageClient" resultType="mypageClient">
+      SELECT *
+      FROM client
+      WHERE client_no = #{client_no}
+   </select>
+</mapper>

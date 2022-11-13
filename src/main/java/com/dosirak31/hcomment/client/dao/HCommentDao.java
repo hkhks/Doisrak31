@@ -1,0 +1,28 @@
+package com.dosirak31.hcomment.client.dao;
+
+import java.util.List;
+
+import com.dosirak31.common.vo.CommonVO;
+import com.dosirak31.hcomment.client.vo.HCommentVO;
+
+public interface HCommentDao {
+	
+	 	public List<HCommentVO> selectAll(Integer health_no);
+
+		public int delete(HCommentVO hcvo);
+		
+		public int insert(HCommentVO hvo);
+
+		public int update(HCommentVO hvo);
+		
+		public int hcommentListCnt(HCommentVO hvo);	//ÀüÃ¼ ´ñ±Û ¼ö Á¶È¸
+
+		public List<HCommentVO> select(HCommentVO hvo); // ÀüÃ¼ ´ñ±Û °¡Á®¿À±â
+		
+		public int deleteadmin(HCommentVO hvo); // °ü¸®ÀÚ ´ñ±Û »èÁ¦
+		
+		public List<HCommentVO> hcommentListExcel(HCommentVO hvo); //Çï½º ´ñ±Û ¿¢¼¿ ´Ù¿î·Îµå 
+		
+		
+							
+}

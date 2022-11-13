@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dosirak31.mypage.review.dao.MypageReviewDao">
+   
+   <!-- 회원 정보 -->
+   <select id="mypageList" parameterType="mypage" resultType="mypage">
+      SELECT *
+      FROM client
+      WHERE client_id = #{client_id}
+   </select>
+   
+   <!-- 자신의 리뷰 목록 -->
+   <!-- <select id="mypageReviewList" parameterType="mypage" resultType="mypage">
+      SELECT review_no, review_contents, review_score, c.client_no,
+         review_name, to_char(review_date, 'YYYY-MM-DD HH24:MI:ss') as review_date
+        FROM review r
+        INNER JOIN client c
+        on r.client_no = c.client_no
+        WHERE c.client_no = #{client_no}
+        ORDER BY r.review_no desc
+   </select> -->
+   
+   <!-- 리뷰 목록 (페이징 처리) -->
+   <select id="mypageReviewList" parameterType="mypage" resultType="mypage">
+   <![CDATA[    
+      SELECT 
+                    review_no, review_contents, review_name, review_score, review_date,  client_no, order_no, 
+                     dosirak_no, dosirak_name, food_img1,food_img2, food_img3,
+                      food_img4, food_img5
+         from (  SELECT 
+                    rownum as rnum, review_no, review_contents, review_name, review_score, review_date,  client_no,  order_no, 
+                     dosirak_no, dosirak_name, food_img1,food_img2, food_img3,
+                      food_img4, food_img5
+         from (  SELECT 
+                     review_no, review_contents, review_name, review_score, review_date, r.client_no as client_no, r.order_no as order_no, 
+                    d.dosirak_no as dosirak_no, d.dosirak_name as dosirak_name, d.food_img1 as food_img1, d.food_img2 as food_img2, d.food_img3 as food_img3,
+                     d.food_img4 as food_img4, d.food_img5 as food_img5
+        FROM review r
+        JOIN orders o     on r.order_no=o.order_no
+        join order_detail od    on o.order_no=od.order_no 
+         join dosirak d        on d.dosirak_no=od.dosirak_no 
+         join payment p          on p.order_no=o.order_no 
+         join client c           on c.client_no=o.client_no 
+      where  r.client_no = #{client_no}
+              order by review_no desc
+        
+        ) reviewList where 
+         rownum<=#{pageNum} *#{amount}
+         )reviewList2
+        where rnum>(#{pageNum}-1)*#{amount}   
+        ]]>
+
+    </select>
+    
+    
+    <!-- 전체 레코드 수 조회 -->
+    <select id="mypageReviewListCnt" parameterType="mypage" resultType="int">
+    	SELECT count(*) FROM review
+        where client_no = #{client_no}
+    </select>
+   
+   <!-- 자신의 리뷰 삭제 -->
+   <delete id="mypageReviewDelete" parameterType="mypage">
+      DELETE from review where review_no = #{review_no}
+   </delete>
+   
+   <!-- 상세페이지 -->
+   <select id="mypageReviewDetail" parameterType="mypage" resultType="mypage">
+      SELECT
+            review_no, review_contents, review_score, client_no, review_name,
+               to_char(review_date, 'YYYY-MM-DD HH24:MI:ss') as review_date
+        FROM review
+        WHERE review_no = ${review_no} 
+   </select>
+   
+   <!-- 리뷰  수정 -->
+   <update id="mypageReviewUpdate" parameterType="mypage">
+      UPDATE review
+      SET review_score = #{review_score},
+         review_contents = #{review_contents}
+      WHERE review_no = #{review_no}
+   </update>
+</mapper>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dosirak31.admin.review.dao.AdminReviewDao">
+   
+   <!-- 관리자 페이지 조회 -->
+   <select id="adminReviewList" parameterType="AdminReview" resultType="AdminReview">
+      <![CDATA[    
+      SELECT 
+                    review_no, review_contents, review_name, review_score, review_date,  client_no, order_no, 
+                     dosirak_no, dosirak_name, food_img1,food_img2, food_img3,
+                      food_img4, food_img5
+         from (  SELECT 
+                    rownum as rnum, review_no, review_contents, review_name, review_score, review_date,  client_no,  order_no, 
+                     dosirak_no, dosirak_name, food_img1,food_img2, food_img3,
+                      food_img4, food_img5
+         from (  SELECT 
+                     review_no, review_contents, review_name, review_score, review_date, r.client_no as client_no, r.order_no as order_no, 
+                    d.dosirak_no as dosirak_no, d.dosirak_name as dosirak_name, d.food_img1 as food_img1, d.food_img2 as food_img2, d.food_img3 as food_img3,
+                     d.food_img4 as food_img4, d.food_img5 as food_img5
+        FROM review r
+        JOIN orders o     on r.order_no=o.order_no
+        join order_detail od    on o.order_no=od.order_no 
+         join dosirak d        on d.dosirak_no=od.dosirak_no 
+         join payment p          on p.order_no=o.order_no 
+         join client c           on c.client_no=o.client_no 
+              order by review_no desc
+        
+        ) reviewList where 
+         rownum<=#{pageNum} *#{amount}
+         )reviewList2
+        where rnum>(#{pageNum}-1)*#{amount}   
+        ]]>
+   </select>
+   
+   
+   <!-- <sql id="reviewSearch">
+      <if test="search=='review_contents'">
+         <![CDATA[ review_contents LIKE '%'|| #{keyword} ||'%' ]]>
+      </if>
+      <if test="search=='review_score'">
+         <![CDATA[ reveiw_score LIKE '%'|| #{keyword} ||'%' ]]>
+      </if>
+      <if test="search=='review_name'">
+         <![CDATA[ review_name LIKE '%'|| #{keyword} ||'%' ]]>
+      </if>
+   </sql> -->
+   
+   <!-- 관리자 페이지 전체 레코드 수 조회 -->
+   <select id="adminReviewListCnt" parameterType="AdminReview" resultType="int">
+      select count(review_no) 
+        FROM ( SELECT 
+                    rownum as rnum, review_no, review_contents, review_name, review_score, review_date, r.client_no as client_no, r.order_no as order_no, 
+                    d.dosirak_no as dosirak_no, d.dosirak_name as dosirak_name, d.food_img1 as food_img1, d.food_img2 as food_img2, d.food_img3 as food_img3,
+                     d.food_img4 as food_img4, d.food_img5 as food_img5
+        FROM review r
+        JOIN orders o     on r.order_no=o.order_no
+        join order_detail od    on o.order_no=od.order_no 
+         join dosirak d        on d.dosirak_no=od.dosirak_no 
+         join payment p          on p.order_no=o.order_no 
+         join client c           on c.client_no=o.client_no)
+   </select>
+   
+   <!-- 관리자 페이지 삭제 -->
+   <delete id="adminReviewDelete" parameterType="AdminReview">
+      DELETE from review where review_no = #{review_no} 
+   </delete>
+</mapper>

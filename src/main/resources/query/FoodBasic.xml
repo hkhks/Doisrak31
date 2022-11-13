@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dosirak31.food.basic.dao.FoodBasicDao">
+	<!-- 푸드 상품 전체 조회 -->
+	<select id="foodBasicList" parameterType="foodBasic" resultType="foodBasic">
+		select food_no,food_category,food_name,food_img,food_price,food_kcal,food_volume,
+		food_calb,food_protein,food_fat from food where food_no=#{food_no} order by food_no desc
+	
+	</select>
+	<!-- 푸드 상품 카테고리별 조회 -->
+	<select id="foodBasicListCategory" parameterType="foodBasic" resultType="foodBasic">
+		select food_no,food_category,food_name,food_img,food_price,food_kcal,food_volume,
+		food_calb,food_protein,food_fat from food
+		where food_category=#{food_category} order by food_no desc
+	</select>
+	
+	<!-- 푸드 번호별 조회 -->
+	<select id="foodBasicListNo" parameterType="foodBasic" resultType="foodBasic">
+		select food_no,food_category,food_name,food_img,food_price,food_kcal,food_volume,
+		food_calb,food_protein,food_fat from food
+		where food_no=#{food_no} order by food_no desc
+	</select>
+	
+	<!-- 푸드 추가 -->
+	<insert id="foodBasicInsert" parameterType="foodBasic">
+		<selectKey keyProperty="food_no" resultType="int" order="BEFORE">
+			select food_seq.nextval from dual
+		</selectKey>
+		insert into food(food_no,food_category,food_name,food_img,food_price,food_kcal,food_volume,food_calb,food_protein,food_fat)
+		values(#{food_no},#{food_category},#{food_name},#{food_img},#{food_price},#{food_kcal},#{food_volume},#{food_calb},#{food_protein},#{food_fat})
+	</insert>
+	
+	<!-- 푸드 삭제 -->
+	<!-- 게시물 삭제  paramerType=foodBasic도 되고 int도 됨 board의 int값이라 둘다 가능-->
+   <delete id="foodBasicDelete" parameterType="foodBasic">
+   		delete from food where food_no=#{food_no}
+   </delete>
+   
+   <!-- 푸드 업데이트(수정) -->
+   <update id="foodBasicUpdate" parameterType="foodBasic">
+   		UPDATE food
+      SET food_category = #{food_category},
+         food_name=#{food_name},
+         food_volume=#{food_volume},
+         food_kcal=#{food_kcal},
+         food_calb=#{food_calb},
+         food_protein=#{food_protein},
+         food_fat=#{food_fat},
+         food_price=#{food_price},
+         food_img=#{food_img}
+      	WHERE food_no = #{food_no}
+   </update>
+</mapper>

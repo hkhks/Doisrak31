@@ -1,0 +1,258 @@
+@charset "UTF-8";
+/******************************* 페이지 버튼 처리 *******************************/
+.pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover,
+   .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover
+   {
+   z-index: 2;
+   color: #fff;
+   cursor: default;
+   background-color: #a5d610;
+   border-color: #a5d610;
+}
+
+.pagination>li>a, .pagination>li>span {
+   position: relative;
+   float: left;
+   padding: 6px 12px;
+   margin-left: -1px;
+   line-height: 1.42857143;
+   color: #337ab7;
+   text-decoration: none;
+   background-color: #fff;
+   border: 1px solid #ddd;
+}
+
+/******************************* hBoardList 시작 *******************************/
+/* 운동 이미지 */
+.img {
+   height: 400px;
+   width: 472px;
+}
+
+.main_contents_hr {
+   width: 325px;
+}
+
+.head {
+   font-size: 35px;
+   text-align: center;
+}
+
+.hBoardListContents {
+   font-size: 20px;
+   margin-bottom: 5px;
+   text-align: center;
+}
+
+.bold {
+   font-weight: bold;
+}
+
+.main_contents {
+   height: 165px;
+}
+
+.container {
+   padding: 30px;
+}
+
+.ul {
+   display: inline-flex;
+   float:left;
+}
+
+.li {
+   float: left;
+   margin-right: 15px;
+   border: 1px solid lightgray;
+   height: 470px;
+}
+
+.span {
+   font-size: 20px;
+   color: black;
+   margin-left: 60px;
+}
+
+/* 위 메인 이미지 */
+#hBoardList_board_img {
+   height: 350px;
+}
+
+/******************************* hBoardList 끝 *******************************/
+
+/******************************* cardioList & weightList 시작 *******************************/
+
+/* 이미지 크기 */
+.img_size {
+   height: 162px;
+   width: 100%;
+}
+/* 게시판 위치 */
+.hBoardList_name_location {
+   padding-top: 83.87px;
+   filter: drop-shadow(2px 4px 6px black);
+}
+
+/* 게시판 이름 */
+.hBoard_Name {
+   font-weight: bold;
+   font-size: 50px;
+   text-align: center;
+}
+
+/* 각 동영상 크기 */
+.health_div {
+   width: 23%;
+   float: left;
+   margin: 25px 10px 50px 0px;
+}
+
+/* 동영상 배경 */
+#health_main {
+   background-color: white;
+}
+
+/* 컨텐츠 위치 */
+.health_contents {
+   margin-left: 55.86px;
+}
+/* 게시물 제목~ 전체 */
+.all_contents {
+   margin-top: 10px;
+}
+/* 게시물 제목 */
+.health_title {
+   font-size: 16px;
+   text-overflow: ellipsis; /* 생략 처리 ( ... )*/
+   overflow: hidden;
+}
+
+.white_space{
+   white-space: nowrap; /*줄바꿈 하지 않고 잘림*/
+}
+
+/* 게시물 작성자 & 조회수 */
+.health_writer_hits {
+   font-size: 14px;
+}
+
+/* 헬스 코멘트 파트 */
+.health_comments_part {
+   margin-top: 20px;
+   margin-bottom: 20px;
+}
+
+/* hr */
+.health_hr {
+   margin-top: 10px;
+   margin-bottom: 10px;
+}
+
+/* 작은 원형 로고이미지 */
+.health_board_info {
+   width: 50px;
+   height: 50px;
+   border-radius: 70%;
+   overflow: hidden;
+   float: left;
+}
+
+.health_logoImg {
+   width: 100%;
+   height: 100%;
+   object-fit: contain;
+}
+
+/* 페이징 */
+.pagination {
+   padding-top: 30px;
+}
+
+/* 검색 */
+.search_bar {
+   text-align: center;
+   margin-bottom: 100px;
+}
+
+.search_space {
+   width: 250px;
+}
+
+/* 리스트 맨위 이미지 */
+.health_listTopImg {
+   height: 350px;
+}
+
+/* 검색 결과 없을 때 처리 */
+.no_page{
+   line-height: 100px;
+   margin-left:-36px;
+   margin-top:80px;
+    text-align: center;     
+}
+
+/******************************* cardioList & weightList 끝 *******************************/
+
+/******************************* cardioDetail & weightDetail 시작 *******************************/
+
+/* 작은 원형 로고이미지 */
+.health_board_info2 {
+   width: 70px;
+   height: 70px;
+   border-radius: 70%;
+   overflow: hidden;
+   float: left;
+}
+
+.health_logoImg2 {
+   width: 100%;
+   height: 100%;
+   object-fit: contain;
+}
+
+/* 게시물 제목 */
+.health_title2 {
+   font-weight: 600px;
+   font-size: 23px;
+}
+
+/* 게시물 작성자 & 조회수 */
+.health_writer_hits2 {
+   font-size: 15px;
+}
+
+/******************************* cardioDetail & weightDetail 끝 *******************************/
+
+/******************************* Admin 페이지 시작 *******************************/
+.healthList_img_size {
+   width: 280px;
+   margin-left: 10px;
+}
+
+.healthList_img_line {
+   width: 500px;
+   display: inline-flex;
+}
+
+.admin_img_size {
+   width: 400px;
+   height: 300px;
+}
+
+.file_location {
+   padding-left: 25px;
+}
+
+.file_location1 {
+   width: 562px;
+}
+
+.youtube_main{
+   display:inline-flex;
+   padding-bottom: 15px;
+}
+
+.youtube{
+   width:425px;
+}

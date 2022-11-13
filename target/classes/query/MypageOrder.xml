@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dosirak31.mypage.order.dao.MypageOrderDao">
+   
+   
+   <!-- 주문내역 리스트 -->
+   <!-- <select id="mypageOrderList" parameterType="orderDetail" resultType="orderDetail">
+   <![CDATA[      
+         select order_no, to_char(order_date,'YYYY-MM-DD HH24:MM:SS') as order_date, order_client_name, order_client_phone,order_address,
+         order_quantity, order_price, dosirak_name, payment_method,payment_delete,client_name,client_phone,order_status_no,food_img1,food_img2,food_img3,food_img4,food_img5
+         from ( select 
+            rownum as rnum,o.order_no as order_no, order_date, order_client_name, order_client_phone,order_address,
+            order_quantity, order_price, dosirak_name, payment_method,payment_delete,client_name,client_phone,order_status_no,food_img1,food_img2,food_img3,food_img4,food_img5
+            from orders o join order_detail od  on o.order_no=od.order_no 
+            join dosirak d on d.dosirak_no=od.dosirak_no 
+            join payment p on p.order_no=o.order_no 
+            join client c on c.client_no=o.client_no where]]>
+                
+                 c.client_no=#{client_no} and
+              
+           <![CDATA[ rownum<=#{pageNum} *#{amount}
+           order by order_no desc
+        ) orderList
+        where rnum>(#{pageNum}-1)*#{amount}
+         ]]>
+
+   </select> -->
+   <select id="mypageOrderList" parameterType="orderDetail" resultType="orderDetail">
+ <![CDATA[    
+      select rnum,order_no, to_char(order_date,'YYYY-MM-DD HH24:MM:SS') as order_date, order_client_name, order_client_phone,order_address,
+         order_quantity, order_price, dosirak_name, payment_method,payment_delete,client_name,client_phone,order_status_no,food_img1,food_img2,food_img3,food_img4,food_img5
+         from ( select  rownum as rnum,order_no, order_date, order_client_name, order_client_phone,order_address,
+         order_quantity, order_price, dosirak_name, payment_method,payment_delete,client_name,client_phone,order_status_no,food_img1,food_img2,food_img3,food_img4,food_img5
+         from ( select   
+            o.order_no as order_no, order_date, order_client_name, order_client_phone,order_address,
+            order_quantity, order_price, dosirak_name, payment_method,payment_delete,client_name,client_phone,order_status_no,food_img1,food_img2,food_img3,food_img4,food_img5
+            from orders o join order_detail od  on o.order_no=od.order_no 
+            join dosirak d on d.dosirak_no=od.dosirak_no 
+            join payment p on p.order_no=o.order_no 
+            join client c on c.client_no=o.client_no where
+                order_status_no in(3,4,5)
+                and o.client_no=#{client_no} 
+              order by o.order_no desc
+        
+        ) orderList where 
+         rownum<=#{pageNum} *#{amount}
+         )orderList2
+        where rnum>(#{pageNum}-1)*#{amount}   
+        ]]>
+   </select>
+  
+   
+    
+    <!-- 페이징처리를 위한 list개수  -->
+   <select id="mypageOrderListCnt" parameterType="orderDetail" resultType="int">
+      select count(order_no) from ( select 
+            o.order_no as order_no
+            from orders o join order_detail od  on o.order_no=od.order_no 
+            join dosirak d on d.dosirak_no=od.dosirak_no 
+            join payment p on p.order_no=o.order_no 
+            join client c on c.client_no=o.client_no
+     
+            where order_status_no in(3,4,5) and o.client_no=#{client_no}
+      ) orderList
+
+   
+   </select>
+   <!-- 주문취소 -->
+   <update id="mypageOrderDelete" parameterType="orderDetail">
+      update orders 
+      set order_status_no=4 
+      where order_no=#{order_no}
+   </update>
+   
+
+   
+   
+</mapper>

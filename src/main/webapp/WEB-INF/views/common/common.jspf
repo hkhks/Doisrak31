@@ -1,0 +1,43 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@page trimDirectiveWhitespaces="true" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="tag" tagdir="/WEB-INF/tags/" %>
+<!DOCTYPE html>
+<html>
+<head>
+	  <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+   
+      <title>Insert title here</title>
+      <link rel="shortcut icon" href="/resources/img/common/dosirak31Logo.png" />
+      <link rel="apple-touch-icon" href="/resources/img/common/dosirak31Logo.png" />
+
+      <link rel="stylesheet" type="text/css" href="/resources/include/dist/css/bootstrap.min.css" />
+      <link rel="stylesheet" type="text/css" href="/resources/include/dist/css/bootstrap-theme.min.css" />
+        <!-- 헬스 css -->
+      <link rel="stylesheet" type="text/css" href="/resources/layout/styles/health/health.css" />
+      
+      <link rel="stylesheet" type="text/css" href="/resources/layout/styles/framework.css" /> <!--  버튼 --> 
+      
+      <!-- 헬스 css -->
+      <link rel="stylesheet" type="text/css" href="/resources/layout/styles/health/health.css" />
+      
+		<!--viral관련 코드-->
+		<link href="/resources/layout/styles/layout.css" rel="stylesheet" type="text/css" media="all">
+
+    	 <script type="text/javascript" src="/resources/include/js/jquery-1.12.4.min.js"></script>
+
+		<!--viral관련 코드-->
+		<script src="/resources/layout/scripts/jquery.min.js"></script>
+		<script src="/resources/layout/scripts/jquery.backtotop.js"></script>
+		<script src="/resources/layout/scripts/jquery.mobilemenu.js"></script>
+      	<script type="text/javascript" src="/resources/include/js/common.js"></script>
+      	<script type="text/javascript" src="/resources/include/dist/js/bootstrap.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=IBM+Plex+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+ <link rel="stylesheet" type="text/css" href="/resources/layout/styles/health/health.css" />

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dosirak31.hcommentreport.client.dao.HcommentReportDao">
+	
+	<!-- 운동 댓글 신고 -->
+	<insert id="reportIn" parameterType="hcReport">
+		INSERT INTO hcomment_report(report_no,reported_id,client_id,reg_date,reason_report,health_comment_no)
+		VALUES(hcomment_report_seq.nextval,#{reported_id},#{client_id},sysdate,#{reason_report},#{health_comment_no})
+	</insert>
+	
+	<sql id="hcommentReportSearch">
+			<if test="search =='health_comment_contents'">
+				<![CDATA[health_comment_contents like '%'||#{keyword}||'%']]>
+			</if>
+			<if test="search =='health_title'">
+				<![CDATA[health_title like '%'||#{keyword}||'%']]>
+			</if>
+			<if test="search =='reason_report'">
+				<![CDATA[reason_report like '%'||#{keyword}||'%']]>
+			</if>
+			<if test="search =='reported_id'">
+				<![CDATA[reported_id like '%'||#{keyword}||'%']]>
+			</if>
+			<if test="search =='client_id'">
+				<![CDATA[client_id like '%'||#{keyword}||'%']]>
+			</if>
+	</sql>
+	
+	
+	<!-- 관리자 페이지에서 신고 댓글 조회(페이징 처리)-->
+	<select id="select" parameterType="hcReport" resultType="hcReport">
+		<![CDATA[
+		select health_comment_no,health_title,health_comment_contents,reg_date,reported_id,reason_report
+		from(
+			select
+			rownum rnum, health_comment_no,health_title,health_comment_contents,reg_date,reported_id,reason_report
+			from (
+					select
+					hr.health_comment_no,health_title,health_comment_contents,hr.reg_date,reported_id,reason_report
+					from hcomment_report hr join hcomment hc
+					on hr.health_comment_no = hc.health_comment_no
+					join health h
+					on hc.health_no = h.health_no
+					order by report_no asc
+			
+				 )
+			where ]]>
+			<trim prefix="(" suffix=") and " prefixOverrides="and">
+				<include refid="hcommentReportSearch"></include>
+			</trim>
+			<![CDATA[ rownum <= #{pageNum} * #{amount}
+			)hcommentReportlist
+		where rnum > (#{pageNum} - 1) * #{amount}
+		]]>
+		
+	</select>
+	
+	<!-- 전체 레코드 수 구현-->
+	<select id="hcommentReportListCnt" parameterType="hcReport" resultType="int">
+		select count(*)
+		from (
+				select
+					hr.health_comment_no,health_title,health_comment_contents,hr.reg_date,reported_id,reason_report
+					from hcomment_report hr join hcomment hc
+					on hr.health_comment_no = hc.health_comment_no
+					join health h
+					on hc.health_no = h.health_no
+			)
+		 <trim prefix=" where(" suffix=") ">
+				<include refid="hcommentReportSearch"></include>
+		 </trim>
+	</select>
+	
+	<!-- 댓글 삭제 구현1-->
+	<delete id="deleteReportAdmin1" parameterType="hcReport">
+		DELETE 
+		FROM hcomment_report
+		WHERE health_comment_no = #{health_comment_no} 
+	</delete>
+	
+	<!-- 댓글 삭제 구현2-->
+	<delete id="deleteReportAdmin2" parameterType="hcReport">
+		DELETE 
+		FROM hcomment
+		WHERE health_comment_no = #{health_comment_no} 
+	</delete>
+	
+	
+</mapper>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dosirak31.client.reply.dao.ReplyDao">
+
+   <!-- 댓글 전체 조회(해당 게시물번호에 대해) -->
+   <select id="replyList" parameterType="reply" resultType="reply">
+      select reply_no, community_no, client_id, reply_contents,
+            to_char(reply_date,'YYYY-MM-DD HH24:MI:SS') as reply_date
+      from reply
+      where community_no = #{community_no}
+      order by reply_no desc
+   </select>   
+
+   <!-- 댓글 등록 -->
+   <insert id="replyInsert" parameterType="reply">
+      /* Reply - replyInsert */
+      <selectKey keyProperty="reply_no" resultType="int" order="BEFORE">
+         select reply_seq.nextval from dual
+      </selectKey>
+         insert into reply(reply_no, community_no, client_id, reply_contents, reply_pw, admin_id)
+         values(#{reply_no}, #{community_no}, #{client_id,jdbcType=VARCHAR}, #{reply_contents}, #{reply_pw}, #{admin_id,jdbcType=VARCHAR})
+   </insert>
+   
+   <!-- 댓글 수정 -->
+   <update id="replyUpdate" parameterType="reply">
+      /* Reply - replyUpdate */
+      update reply
+      set reply_contents = #{reply_contents}    <!-- #{r_content} <= VO의 필드값을 get으로 받아온다 -->
+         ,reply_date = sysdate
+         <if test="reply_pw != ''">
+            ,reply_pw = #{reply_pw}
+         </if>
+      where reply_no = #{reply_no}
+   </update>
+   
+   
+   <!-- 댓글 삭제 -->
+   <delete id="replyDelete" parameterType="reply">
+      /* Reply - replyDelete */
+      delete from reply where reply_no = #{reply_no}
+   </delete>
+   
+   <!-- 댓글 개수 구하기 -->
+   <select id="replyCnt" parameterType="int" resultType="int">
+      /* Reply - replyCnt */
+      select count(reply_no) from reply where community_no = #{community_no}
+   </select>
+
+
+
+</mapper>

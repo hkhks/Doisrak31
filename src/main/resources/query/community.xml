@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dosirak31.client.community.dao.CommunityDao">
+   
+   <!-- 커뮤니티 게시판 리스트 기본 조회 
+   <select id="communityList" parameterType="community" resultType="community">
+      SELECT community_no, client_id, community_title, to_char(community_date, 'YYYY-MM-DD') as community_date, community_hits
+      FROM community
+      ORDER BY community_no desc
+   </select>   -->
+   
+   <!-- 게시판 리스트 검색부분 추가 
+   <select id="communityList" parameterType="community" resultType="community">
+      SELECT community_no, client_id, community_title, to_char(community_date, 'YYYY-MM-DD') as community_date, community_hits, file_name, file_thumb,  
+      (select count(reply_no) from reply where community_no = communitylist.community_no) as reply_cnt
+      FROM community communitylist
+      <where>
+         <if test="search=='community_title'">
+            <![CDATA[ community_title LIKE '%'|| #{keyword} ||'%' ]]>
+         </if>
+         <if test="search=='community_contents'">
+            <![CDATA[ community_contents LIKE '%'|| #{keyword} ||'%' ]]>
+         </if>
+         <if test="search=='client_id'">
+            <![CDATA[ client_id LIKE '%'|| #{keyword} ||'%' ]]>
+         </if>
+      </where>
+      ORDER BY community_no desc
+   </select>  -->
+   
+   <sql id="communitySearch">
+      <if test="search=='community_title'">
+         <![CDATA[ community_title LIKE '%'|| #{keyword} ||'%' ]]>
+      </if>
+      <if test="search=='community_contents'">
+         <![CDATA[ community_contents LIKE '%'|| #{keyword} ||'%' ]]>
+      </if>
+      <if test="search=='client_id'">
+         <![CDATA[ client_id LIKE '%'|| #{keyword} ||'%' ]]>
+      </if>
+   </sql>
+   
+   <!--  커뮤니티 게시판 리스트 조회(페이징 처리와 검색 처리) 및 댓글 갯수 구하기 PK_community_no-->
+   <select id="communityList" parameterType="community" resultType="community">
+      <![CDATA[
+      SELECT 
+            community_no, client_id, community_title, to_char(community_date, 'YYYY-MM-DD') as community_date, community_hits, file_thumb, file_name,community_closed, community_category_no, admin_id, community_notify,
+            (select count(reply_no) from reply where community_no = communitylist.community_no) as reply_cnt
+      FROM(
+             select /*+ index_desc(community PK_community_no) */
+                     rownum as rnum, community_no, client_id, community_title, community_date, community_hits, file_thumb, file_name,community_closed, community_category_no, admin_id, community_notify
+               from community 
+               where community_category_no = #{community_category_no} and ]]>
+               <trim prefix="(" suffix=") AND " prefixOverrides="AND">
+                     <include refid="communitySearch"></include>
+               </trim>
+           <![CDATA[    rownum <= #{pageNum} * #{amount}
+              ) communitylist
+           WHERE rnum > (#{pageNum} - 1) * #{amount} 
+           ]]>
+   </select> 
+   
+   
+   <!--  전체 레코드 수 조회 -->
+   <select id="communityListCnt" parameterType="community" resultType="int">
+      SELECT count(*) FROM community 
+      where community_category_no = #{community_category_no}
+      <trim prefix=" AND (" suffix=") " prefixOverrides="AND">
+            <include refid="communitySearch"></include>
+        </trim>
+   </select>
+   
+   
+   
+   <!-- 게시물 등록 - 2 -->
+   <insert id="communityInsert" parameterType="community">
+      /* Community - communityInsert */
+      <selectKey keyProperty="community_no" resultType="int" order="BEFORE">
+         select community_seq.nextval from dual
+      </selectKey>
+      
+      INSERT INTO community(community_no, client_id, community_title, community_contents, community_pw, file_name, file_thumb, community_closed, community_category_no, admin_id, community_notify ) 
+      VALUES(#{community_no}, #{client_id,jdbcType=VARCHAR}, #{community_title}, #{community_contents}, #{community_pw}, #{file_name}, #{file_thumb}, #{community_closed}, #{community_category_no}, #{admin_id,jdbcType=VARCHAR}, #{community_notify} )
+      
+      
+   </insert>
+   
+   
+   
+   <!-- 상세 페이지를 위한 게시물 조회 -->
+   <select id="communityDetail" parameterType="community" resultType="community">
+      /* community - communityDetail */
+      SELECT
+            community_no, client_id, community_title, community_contents,
+            TO_CHAR(community_date,'YYYY-MM-DD HH24:MI:SS') AS community_date, community_hits, file_name, file_thumb, community_closed, community_category_no, admin_id, community_notify
+      FROM community
+      WHERE community_no = #{community_no} and community_category_no = #{community_category_no}
+   </select>
+   
+   <update id="readCntUpdate" parameterType="community">
+      /* community - readCntUpdate */
+      UPDATE community
+      SET community_hits = community_hits + 1
+      WHERE community_no = #{community_no}
+   </update> 
+   
+   <!-- 해당 번호의 비밀번호 확인 -->
+   <select id="pwdConfirm" parameterType="community" resultType="int">
+      /* community - pwdConfirm */
+      SELECT NVL((
+                  SELECT 1 FROM community
+                  WHERE community_no = #{community_no} AND community_pw = #{community_pw}
+               ), 0) as state
+      FROM dual
+   </select>
+   
+   
+   <!-- 게시물 수정 -->
+   <update id="communityUpdate" parameterType="community">
+      /* community - communityUpdate*/
+      UPDATE community
+      SET community_title = #{community_title},
+         community_contents = #{community_contents},
+         community_date = sysdate
+         <if test="community_pw !=''">
+            , community_pw = #{community_pw}
+         </if>
+         <if test="file_name !=''">
+            , file_name = #{file_name}
+         </if>
+         <if test="file_thumb !=''">
+            , file_thumb = #{file_thumb}
+         </if>  
+      WHERE community_no = #{community_no} And community_category_no = #{community_category_no}
+   </update>
+   
+   <!-- 게시물 삭제 -->
+   <delete id="communityDelete" parameterType="community">
+      /* Community - communityDelete*/
+      DELETE FROM community WHERE community_no = #{community_no}
+   </delete>
+   
+   
+   
+   
+   
+</mapper>
